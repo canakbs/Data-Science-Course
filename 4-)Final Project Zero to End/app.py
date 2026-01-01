@@ -21,27 +21,60 @@ def home():
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
-        # 1. Get Data from Form
-        input_data = {
-            'age': int(request.form['age']),
-            'gender': request.form['gender'],
-            'marital_status': request.form['marital_status'],
-            'education_level': request.form['education_level'],
-            'annual_income': float(request.form['annual_income']),
-            'employment_status': request.form['employment_status'],
-            'credit_score': int(request.form['credit_score']),
-            'loan_amount': float(request.form['loan_amount']),
-            'loan_purpose': request.form['loan_purpose'],
-            'loan_term': int(request.form['loan_term'])
-        }
-        credit_score = int(request.form['credit_score']) # Skoru değişkene al
-
+        # 1. Extract Raw Data for Validation
+        # We extract specific numbers first to check if they are valid.
+        age = int(request.form['age'])
+        annual_income = float(request.form['annual_income'])
+        loan_amount = float(request.form['loan_amount'])
+        credit_score = int(request.form['credit_score'])
+        loan_term = int(request.form['loan_term'])
         
+        # ----------------------------------------------------------------
+        # 🛡️ INPUT VALIDATION LAYER (Check for Negative Numbers & Age)
+        # ----------------------------------------------------------------
+        
+        # Rule 1: Loan amount and Income cannot be negative or zero
+        if loan_amount <= 0 or annual_income <= 0:
+             return render_template('result.html', 
+                                   prediction_text="INVALID INPUT ⚠️", 
+                                   probability="Reason: Loan amount and Income must be positive numbers.",
+                                   result_class="danger")
+
+        # Rule 2: Age Validation (Banking rules usually require 18+)
+        if age < 18 or age > 100:
+             return render_template('result.html', 
+                                   prediction_text="INVALID INPUT ⚠️", 
+                                   probability="Reason: Age must be between 18 and 100.",
+                                   result_class="danger")
+
+        # ----------------------------------------------------------------
+        # 🛑 HARD RULES / POLICY LAYER (Automatic Rejection)
+        # ----------------------------------------------------------------
+        
+        # Rule 3: Credit Score < 400 is automatic rejection.
         if credit_score < 400:
             return render_template('result.html', 
                                    prediction_text="LOAN REJECTED ❌", 
                                    probability="Reason: Credit Score too low (Policy Rule)",
                                    result_class="danger")
+
+        # ----------------------------------------------------------------
+        # 🤖 AI MODEL LAYER (Machine Learning Prediction)
+        # ----------------------------------------------------------------
+
+        # Prepare data dictionary for the DataFrame
+        input_data = {
+            'age': age,
+            'annual_income': annual_income,
+            'loan_amount': loan_amount,
+            'credit_score': credit_score,
+            'loan_term': loan_term,
+            'gender': request.form['gender'],
+            'marital_status': request.form['marital_status'],
+            'education_level': request.form['education_level'],
+            'employment_status': request.form['employment_status'],
+            'loan_purpose': request.form['loan_purpose']
+        }
 
         # 2. Convert to DataFrame
         df_input = pd.DataFrame([input_data])
