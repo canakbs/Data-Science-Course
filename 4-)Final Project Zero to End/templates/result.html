@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Application Result</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container result-container">
+        <h1 class="{{ result_class }}">{{ prediction_text }}</h1>
+        <p class="score">{{ probability }}</p>
+        
+        <a href="/" class="btn-back">Make New Inquiry</a>
+    </div>
+</body>
+</html>
