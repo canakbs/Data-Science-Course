@@ -36,8 +36,7 @@ def predict():
         }
         credit_score = int(request.form['credit_score']) # Skoru değişkene al
 
-        # --- SİGORTA KURALI (Business Rule Layer) ---
-        # Eğer skor 400'den küçükse, modele sormadan direkt RED ver.
+        
         if credit_score < 400:
             return render_template('result.html', 
                                    prediction_text="LOAN REJECTED ❌", 
@@ -63,10 +62,10 @@ def predict():
 
         # 6. Interpret Result
         if prediction == 1:
-            result_text = "LOAN APPROVED ✅"
+            result_text = "LOAN APPROVED "
             result_class = "success"
         else:
-            result_text = "LOAN REJECTED ❌"
+            result_text = "LOAN REJECTED "
             result_class = "danger"
 
         return render_template('result.html', 
